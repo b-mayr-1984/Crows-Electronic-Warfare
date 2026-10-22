@@ -46,10 +46,10 @@ if (_enable) then {
 				_drone engineOn false;	// turn off engine
 				_sinkrateFactor = -0.5;	// slow down sink rate near ground
 			};
-			private _pullForce = _drone getVariable[QGVAR(aiPullForce), 0];
+			private _pullForceOld = _drone getVariable[QGVAR(aiPullForce), -2];
 			private _sinkrate = velocity _drone select 2;
-			// TODO: special case when sinkrate is positive
-			_pullForce = (_pullForce * _sinkrateFactor/(_sinkrate min -0.1) min -1.5);	// control sinkrate to be around _sinkrateFactor in m/s
+			private _pullForce = (_pullForceOld * _sinkrateFactor/(_sinkrate min -0.1) min -1.5);	// control sinkrate to be around _sinkrateFactor in m/s
+			_pullForce = _pullForce max 2*_pullForceOld;	// limit increase of pull force by a factor of 2 per frame
 			_drone addForce [[0,0,_pullForce], [0,0,0]];
 			_drone setVariable[QGVAR(aiPullForce), _pullForce, true];	// store updated pull force
 		}, 0, [_unit]] call CBA_fnc_addPerFrameHandler;
