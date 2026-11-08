@@ -42,6 +42,15 @@ ADDON = true;
 ] call CBA_fnc_addSetting;
 
 [
+    QGVAR(useLambsShareInformationHandler), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
+    "CHECKBOX", // setting type
+    [localize "STR_CROWSEW_Spectrum_settings_use_lambsShareInformationHandler", [localize "STR_CROWSEW_Spectrum_settings_use_lambsShareInformationHandler_tooltip", "<br/>", endl] call CBA_fnc_replace],
+    "Crows Electronic Warfare",
+    true,	// default value
+    nil
+] call CBA_fnc_addSetting;
+
+[
     QGVAR(minJamSigStrength), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "SLIDER", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_min_jam_strength", localize "STR_CROWSEW_Spectrum_settings_min_jam_strength_tooltip"], 
@@ -246,6 +255,21 @@ GVAR(voiceLinePacks) set ["electronic", 		[GVAR(voiceLinesElectronicList), GVAR(
 GVAR(voiceLinePacks) set ["alienElectronic", 	[GVAR(voiceLinesAlienElectronicList), GVAR(voiceLinesAlienElectronicWeights), localize "STR_CROWSEW_Spectrum_voiceline_alien_electronic"]];
 GVAR(voiceLinePacks) set ["police", 			[GVAR(voiceLinesPoliceList), GVAR(voiceLinesPoliceWeights), localize "STR_CROWSEW_Spectrum_voiceline_police_radio"]];
 
+// ambient radio sounds with unintelligible voice
+GVAR(garbledRadioCommsSounds) = [
+					"A3\Sounds_F\sfx\radio\ambient_radio2.wss", 
+					"A3\Sounds_F\sfx\radio\ambient_radio6.wss", 
+					"A3\Sounds_F\sfx\radio\ambient_radio8.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio9.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio12.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio13.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio16.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio18.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio20.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio21.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio22.wss",
+					"A3\Sounds_F\sfx\radio\ambient_radio29.wss"
+				];
 
 // Spectrum autoline settings
 GVAR(spectrumAutolineColours) = ["ColorBlack", "ColorGrey", "ColorRed", "ColorBrown", "ColorOrange", "ColorYellow", "ColorKhaki", "ColorGreen", "ColorBlue", "ColorPink", "ColorWhite", "ColorWEST", "ColorEAST", "ColorGUER", "ColorCIV"]; // Must only contain colours from CfgMarkerColors
@@ -271,7 +295,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutoline), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "CHECKBOX", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_enable", [localize "STR_CROWSEW_Spectrum_settings_autoline_enable_tooltip", "<br/>", endl] call CBA_fnc_replace],
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     true,
     nil
 ] call CBA_fnc_addSetting;
@@ -281,7 +305,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutolineLength), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "SLIDER", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_length", localize "STR_CROWSEW_Spectrum_settings_autoline_length_tooltip"], 
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     [200, 15000, 6000, 0],
     nil
 ] call CBA_fnc_addSetting;
@@ -290,7 +314,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutolineColor1), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "LIST", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_color1", localize "STR_CROWSEW_Spectrum_settings_autoline_color1_tooltip"],
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     [_autolineColourIndexes, _autolineColourLabels, 2],
     nil
 ] call CBA_fnc_addSetting;
@@ -299,7 +323,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutolineColor2), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "LIST", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_color2", localize "STR_CROWSEW_Spectrum_settings_autoline_color2_tooltip"],
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     [_autolineColourIndexes, _autolineColourLabels, 7],
     nil
 ] call CBA_fnc_addSetting;
@@ -308,7 +332,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutolineColor3), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "LIST", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_color3", localize "STR_CROWSEW_Spectrum_settings_autoline_color3_tooltip"],
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     [_autolineColourIndexes, _autolineColourLabels, 8],
     nil
 ] call CBA_fnc_addSetting;
@@ -317,7 +341,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutolineColor4), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "LIST", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_color4", localize "STR_CROWSEW_Spectrum_settings_autoline_color4_tooltip"],
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     [_autolineColourIndexes, _autolineColourLabels, 5],
     nil
 ] call CBA_fnc_addSetting;
@@ -326,7 +350,7 @@ private _autolineColourLabels = GVAR(spectrumAutolineColours) apply { _x select 
     QGVAR(spectrumAutolineNoise), // Internal setting name, should always contain a tag! This will be the global variable which takes the value of the setting.
     "SLIDER", // setting type
     [localize "STR_CROWSEW_Spectrum_settings_autoline_deviation", [localize "STR_CROWSEW_Spectrum_settings_autoline_deviation_tooltip", "<br/>", endl] call CBA_fnc_replace],  
-    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_catageory"],
+    ["Crows Electronic Warfare", localize "STR_CROWSEW_Spectrum_settings_autoline_category"],
     [0, 100, 0, 0],
     nil
 ] call CBA_fnc_addSetting;
